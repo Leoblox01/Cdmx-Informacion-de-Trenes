@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CDMX Informacion de los trenes</title>
+    <style>
+        body { background: #0A0A0A; color: #FF7F00; font-family: 'Courier New', monospace; display: flex; margin: 0; height: 100vh; overflow: hidden; }
+        
+        /* PANTALLA DE CARGA */
+        #carga { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s ease; }
+        #carga img { width: 80%; max-width: 800px; border: 2px solid #FF7F00; box-shadow: 0 0 20px #FF7F00; }
+        .loading-text { margin-top: 20px; font-weight: bold; letter-spacing: 5px; animation: blink 1s infinite; }
+        
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* DASHBOARD */
+        #panel-izq { width: 300px; background: #000; border-right: 2px solid #FF7F00; padding: 20px; overflow-y: auto; }
+        #panel-der { flex: 1; padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        h2 { border-bottom: 2px solid #FF7F00; padding-bottom: 10px; text-transform: uppercase; }
+        button { display: block; width: 100%; margin: 10px 0; background: transparent; border: 1px solid #FF7F00; color: #FF7F00; cursor: pointer; padding: 12px; font-weight: bold; text-transform: uppercase; }
+        button:hover { background: #FF7F00; color: #000; box-shadow: 0 0 10px #FF7F00; }
+        #datos { max-width: 600px; font-size: 1.2em; line-height: 1.5; text-align: justify; }
+    </style>
+</head>
+<body>
+
+<div id="carga">
+    <!-- Imagen cargada desde nm22.jpg -->
+    <img src="nm22.jpeg" alt="Cargando">
+    <div class="loading-text">Aficionados CDMX</div>
+</div>
+
+<div id="panel-izq">
+    <h2>CONTROL CENTRAL</h2>
+    <button onclick="ver('MP-68')">MP-68</button>
+    <button onclick="ver('NM-73')">NM-73</button>
+    <button onclick="ver('NM-79')">NM-79</button>
+    <button onclick="ver('MP-82')">MP-82</button>
+    <button onclick="ver('NC-82')">NC-82</button>
+    <button onclick="ver('NM-83')">NM-83</button>
+    <button onclick="ver('FM-86')">FM-86</button>
+    <button onclick="ver('NE-92')">NE-92</button>
+    <button onclick="ver('FM-95A')">FM-95A</button>
+    <button onclick="ver('NM-02')">NM-02</button>
+    <button onclick="ver('FE-07')">FE-07</button>
+    <button onclick="ver('FE-10')">FE-10</button>
+    <button onclick="ver('NM-16')">NM-16</button>
+    <button onclick="ver('NM-22 / NCH-22')">NM-22 / NCH-22</button>
+</div>
+
+<div id="panel-der">
+    <h1 id="titulo">SISTEMA INICIALIZADO</h1>
+    <p id="datos">Selecciona un modelo del panel izquierdo para desplegar especificaciones técnicas.</p>
+</div>
+
+<script>
+    // Quita la pantalla de carga después de 3 segundos
+    setTimeout(() => { document.getElementById('carga').style.opacity = '0'; setTimeout(() => document.getElementById('carga').style.display = 'none', 1000); }, 3000);
+
+    const db = {
+        "MP-68": "MP-68: Su nombre completo es Materiel Roulant Sur Pneumatiques 1968 (Al español traducido como Material Sobre Neumaticos del 1968), fue hecho por la empresa Alstom, de origen frances, este fue el tren que inauguro el metro con la Linea 1, su primer sistema de traccion fue el JH, pero en su rehabilitacion del 2014 fue Chopper IGBT, Sobre este hubo otra rehabilitacion en el 1996, donde existieron los MP-68R96, MP-68R96B y MP-68R96C, los nombres de estos mas que nada el R96, R96B o C no es una serie, son las iniciales de su marca rehabilitadora, por ejemplo: MP-68R96CAF o MP68R96BOMBARDIER, se le conoce a los R96C por su dada de baja, debido al choque en Tacubaya del 2020, actualmente los mp-68 se encuentran en Lineas 5 y B",
+        "NM-73": "NM-73: El nombre completo de este tren seria Neumatico Mexicano del 1973, fue el 2do tren de catalogo del metro, siendo este la compañia del MP-68 en la inaugurada Linea 1 antes de la Linea 2, cuando se inauguro Linea 2 algunos trenes se trasladaron ahi, este tren tuvo una motris (195-196) que probo un sistema de traccion como prototipo, siendo este el quessard, pero fue dado de baja y convertido a carro NE-92 (550-551), actualmente se encuentra dado de baja.",
+        "NM-79": "NM-79: Este fue el 3er modelo del metro de la ciudad de mexico, la flota se distribuyo entre las 3 lineas que estaban abiertas (Linea 1, 2 y 3), tuvo trenes recuperados gracias a Ricardo ortega, uno de los mas conocidos es el Cri-Cri, tambien se le puso el esquema mandarino.",
+        "MP-82": "MP-82: Este tren fue el 2do tren que se le adquirió a alstom, siendo este llamado MP-82 (Materiel Sur Pneumatique 1982), este tren conto con un sistema de traccion Chopper, pero era frances, por lo que sonaba como Fa Si Fa (notas musicales), despues termino cambiandose este en el 2015 a IGBT.",
+        "NC-82": "NC-82: Este tren fue adquirido desde canada a la empresa Bombardier, el nombre seria Neumatico Canadiense 1982, este tren se le caracteriza por su sistema Chopper scr (hasta el momento lo conserva), tambien se le conoce como *El borracho* por sus cierres de puertas distorsionados.",
+        "NM-83": "NM-83: Neumático Mexicano 1983, fabricado por Concarril y Alstom. Es la columna vertebral del Metro, reconocido por su alta fiabilidad y capacidad de carga. Es un tren de rodadura neumática que ha superado la vida útil programada gracias a sus constantes rehabilitaciones.",
+        "FM-86": "FM-86: Férreo Mexicano 1986, fabricado por Concarril específicamente para la Línea A. Este modelo introdujo la rodadura férrea al sistema, utilizando una configuración de alimentación eléctrica por catenaria en lugar de la barra guía tradicional.",
+        "NE-92": "NE-92: Neumático Español 1992, fabricado por CAF. Este modelo marcó un salto tecnológico al integrar sistemas electrónicos de control más complejos y mejoras significativas en la eficiencia de su sistema de frenado neumático.",
+        "FM-95A": "FM-95A: Este tren su nombre completo seria Ferreo Mexicano 1995 de la linea A, el cual se le conoce por ser extinto debido a sus fallas, sus constructores fueron Caf y bombardier, intentaron utilizar informatica para monitorear los trenes pero fallo, la flota se dio de baja, en el 2017 se recuperaron solamente 2 trenes pero volvieron a fallar, hasta el momento su flota es una baja total.",
+        "NM-02": "NM-02: Este tren fue igual que el FM-95A, construido por las mismas empresas juntas, reparando el error informatico, este tren fue hecho especificamente para la modernizacion de la linea 2 en el año 2006, el contrato se hizo en el 2002, este tren tiene un sistema de traccion VVVF, lo que a algunos metro aficionados amamos en sus arranques y frenado en velocidad.",
+        "FE-07": "FE-07: Siglas de Ferreo Español 2007, construido por la empresa CAF. Este modelo fue diseñado para operar con rodadura férrea, destacando por la implementación de sistemas de frenado magnético y una estructura reforzada para mejorar la seguridad y la eficiencia en la operación de las líneas férreas del sistema.",
+        "FE-10": "FE-10: Ferreo Español 2010, también fabricado por CAF, es el modelo insignia diseñado específicamente para la Línea 12. Su característica técnica mas sobresaliente es el uso de bogies autoguiados, los cuales permiten al tren sortear curvas cerradas con una menor fricción y desgaste, garantizando una marcha mas suave y estable durante el servicio.",
+        "NM-16": "NM-16: El nombre de este tren es Neumatico Mexicano del 2016, fue construido por CAF, era como la modernizacion de la linea 1, de los 45 trenes contemplados, fueron solamente 10 trenes, lo que seguirian con los trenes viejos, al llegar los NM-16 a pruebas se rumoreaba la incompatibilidad de pilotaje automatico, y fue cierto, este tren no era apto para ese pilotaje, por lo que fue una de las causas de la modernizacion de la linea 1, siendo estas vida util y otro tipo de pilotaje, el NM-16 fue la ultima adquisicion a CAF, debido a las fallas que este presentaba, como ventiladores rotos, fallas de pilotaje, entre otras, el NM-16 Cuenta igualmente con un VVVF del 2016",
+        "NM-22 / NCH-22": "NM-22: Este tren es el mas moderno del catalogo de la ciudad de mexico, este tren seria el primero en tener dos nombres, siendo el NM-22 (Neumatico Mexicano 2022) y NCH-22 (Neumatico CHino 2022), este tren fue adquirido para la modernizacion de la linea 1, se adquirio a la empresa CRRC Zhuzhou Locomotive, importados de china, este tren vendria con tecnologia nueva, como pantallas al interior, varios tipos de timbre de cierre de puertas, nuevo sonido de proxima estacion, dejando al clasico tururu, pilotaje CBTC (Control Base a travez de TeleComunicaciones), monitoreado por Wi-Fi, lo que los permite ir pegados sin tener colisiones, tiene un VVVF del año 2022, y suena similar al del NM-16"
+    };
+
+    function ver(modelo) {
+        document.getElementById('titulo').innerText = modelo;
+        document.getElementById('datos').innerText = db[modelo];
+    }
+</script>
+
+</body>
+</html>
